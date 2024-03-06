@@ -3,7 +3,7 @@ const fs = require("fs").promises; // Bruker promises for enklere asynkron flytk
 const path = require("path");
 
 // Initialiser Firebase Admin SDK
-const serviceAccount = require("./serviceAccountKey.json");
+const serviceAccount = require("../serviceAccountKey.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   storageBucket: "gs://bachelor-7e242.appspot.com",
