@@ -20,7 +20,7 @@ jobs:
       run: npm install -g firebase-tools
 
     - name: Authenticate Firebase
-      run: echo '${{ secrets.firebase_storage }}' > ./firebase-key.json && firebase login:ci --no-localhost --token $(firebase login:ci --no-localhost --interactive)
+      run: echo '${{ secrets.FIREBASE_STORAGE }}' > ./firebase-key.json && firebase login:ci --no-localhost --token $(firebase login:ci --no-localhost --interactive)
 
     - name: Upload Files to Firebase Storage
       run: node uploadfirebase/uploadToFirebase.js
