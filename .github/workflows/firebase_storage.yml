@@ -1,28 +1,28 @@
-name: Upload Files to Firebase Storage
+name: Deploy Files to Firebase Storage
 
 on:
   push:
     branches:
-      - main # Sett dette til branchen du bruker for deployment
+      - main # eller den branchen du ønsker å deploye fra
 
 jobs:
-  upload_to_firebase:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14' # Bruk den Node.js-versjonen som passer for ditt prosjekt
+      - uses: actions/checkout@v2
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18' # Eller hvilken Node.js-versjon du foretrekker
 
-    - name: Install Firebase CLI
-      run: npm install -g firebase-tools
+      - name: Setup Firebase Service Account Key
+        run: echo '${{ secrets.FIREBASE_STORAGE }}' > serviceAccountKey.json
 
-    - name: Authenticate Firebase
-      run: echo '${{ secrets.firebase_storage }}' > ./firebase-key.json && firebase login:ci --no-localhost --token $(firebase login:ci --no-localhost --interactive)
+      - name: Install dependencies
+        run: npm install firebase-admin # Legg til dine nødvendige npm pakker her
 
-    - name: Upload Files to Firebase Storage
-      run: node uploadfirebase/uploadToFirebase.js
-      env:
-        FIREBASE_KEY_PATH: './firebase-key.json'
+      - name: Upload Files to Firebase Storage
+        run: node uploadfirebase/uploadToFirebase.js
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
