@@ -1,0 +1,10 @@
+C:\Users\sara1\fakelogonscreen-master\Source\bin\Debug\FakeLogonScreen.exe.config
+C:\Users\sara1\fakelogonscreen-master\Source\bin\Debug\FakeLogonScreen.exe
+C:\Users\sara1\fakelogonscreen-master\Source\bin\Debug\FakeLogonScreen.pdb
+C:\Users\sara1\fakelogonscreen-master\Source\obj\Debug\FakeLogonScreen.csproj.AssemblyReference.cache
+C:\Users\sara1\fakelogonscreen-master\Source\obj\Debug\FakeLogonScreen.LogonScreen.resources
+C:\Users\sara1\fakelogonscreen-master\Source\obj\Debug\FakeLogonScreen.Properties.Resources.resources
+C:\Users\sara1\fakelogonscreen-master\Source\obj\Debug\FakeLogonScreen.csproj.GenerateResource.cache
+C:\Users\sara1\fakelogonscreen-master\Source\obj\Debug\FakeLogonScreen.csproj.CoreCompileInputs.cache
+C:\Users\sara1\fakelogonscreen-master\Source\obj\Debug\FakeLogonScreen.exe
+C:\Users\sara1\fakelogonscreen-master\Source\obj\Debug\FakeLogonScreen.pdb
