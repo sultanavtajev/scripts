@@ -32,119 +32,67 @@ $escapedPcName = $pcName.Replace(" ", "%20")
 # Definer URL-en for dokumentet
 $documentUrl = "https://firestore.googleapis.com/v1/projects/$projectID/databases/(default)/documents/$collectionName/$escapedPcName"
 
-# Sjekk om et dokument med samme navn allerede eksisterer
-$duplicateDocument = $null
+# Forsøk å opprette et dokument med et dummy felt
+$newDocBody = @{
+    fields = @{
+        dummyField = @{ stringValue = "init" }
+    }
+} | ConvertTo-Json -Depth 2
+
+# Forsøk å opprette eller oppdatere dokumentet
 try {
-    $duplicateDocument = Invoke-RestMethod -Uri $documentUrl -Method Get
+    Invoke-RestMethod -Uri $documentUrl -Method Patch -Body $newDocBody -ContentType 'application/json'
+    Write-Output "Document created or updated with dummy field"
 } catch {
-    # Hvis dokumentet ikke finnes, vil dette kaste en feil, som vi kan ignorere
+    Write-Error "Error creating or updating document: $_"
 }
 
-# Hvis et dokument med samme navn eksisterer under kolleksjonen "machines"
-if ($duplicateDocument) {
-    # Opprett en ny kolleksjon med dagens dato og tid som navn
-    $collectionName = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
+# Vent og forsikre at dokumentet er opprettet eller oppdatert
+Start-Sleep -Seconds 5
 
-    # Opprett URL-en for den nye kolleksjonen
-    $newCollectionUrl = "$documentUrl/$collectionName"
+# Definer URL-en for den nye sub-kolleksjonen, med dagens dato og tid som navn
+$dateTimeCollectionName = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
+$newCollectionUrl = "$documentUrl/$dateTimeCollectionName"
 
-    # Opprett en enkel JSON-kropp for POST-forespørselen
-    $body = @{
-        fields = @{
-            # Legg til informasjonen du vil lagre under den nye kolleksjonen
-            name = @{
-                stringValue = $pcName
-            }
-            status = @{
-                stringValue = "Operational"
-            }
-            userName = @{
-                stringValue = $userName
-            }
-            userDomainName = @{
-                stringValue = $userDomainName
-            }
-            osVersion = @{
-                stringValue = $osVersion.ToString()
-            }
-            commandLine = @{
-                stringValue = $commandLineArgs -join " "
-            }
-            currentDirectory = @{
-                stringValue = $currentDirectory
-            }
-            systemDirectory = @{
-                stringValue = $systemDirectory
-            }
-            processorCount = @{
-                integerValue = $processorCount
-            }
-        }
-    } | ConvertTo-Json -Depth 10
-
-    # Definer HTTP-headere
-    $headers = @{
-        "Content-Type" = "application/json"
+# Opprett en enkel JSON-kropp for POST-forespørselen
+$body = @{
+    fields = @{
+name = @{
+        stringValue = $pcName}
+        status = @{ stringValue = "Operational" }
+        userName = @{ stringValue = $userName }
+        userDomainName = @{ stringValue = $userDomainName }
+        osVersion = @{ stringValue = $osVersion.ToString() }
+        commandLine = @{ stringValue = $commandLineArgs -join " " }
+        currentDirectory = @{ stringValue = $currentDirectory }
+        systemDirectory = @{ stringValue = $systemDirectory }
+        processorCount = @{ integerValue = $processorCount }
     }
+} | ConvertTo-Json -Depth 10
 
-    # Send POST-forespørselen for å opprette den nye kolleksjonen og lagre informasjonen
-    try {
-        $response = Invoke-RestMethod -Uri $newCollectionUrl -Method Post -Body $body -Headers $headers
-        Write-Output "Response from Firestore: $response"
-    } catch {
-        Write-Error "Error sending data to Firestore: $_"
+# Definer HTTP-headere
+$headers = @{
+    "Content-Type" = "application/json"
+}
+
+# Send POST-forespørselen for å opprette den nye sub-kolleksjonen og lagre informasjonen
+try {
+    $response = Invoke-RestMethod -Uri $newCollectionUrl -Method Post -Body $body -Headers $headers
+    Write-Output "Response from Firestore: $response"
+} catch {
+    Write-Error "Error sending data to Firestore: $_"
+}
+
+# Fjern dummy feltet
+$removeDummyField = @{
+    fields = @{
+        dummyField = @{ nullValue = $null } # Endre null til $null
     }
-} else {
-    # Opprett en ny kolleksjon med dagens dato og tid som navn
-    $collectionName = (Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
+} | ConvertTo-Json -Depth 2
 
-    # Opprett URL-en for den nye kolleksjonen
-    $newCollectionUrl = "$documentUrl/$collectionName"
-
-    # Opprett en enkel JSON-kropp for POST-forespørselen
-    $body = @{
-        fields = @{
-            # Legg til informasjonen du vil lagre under den nye kolleksjonen
-            name = @{
-                stringValue = $pcName
-            }
-            status = @{
-                stringValue = "Operational"
-            }
-            userName = @{
-                stringValue = $userName
-            }
-            userDomainName = @{
-                stringValue = $userDomainName
-            }
-            osVersion = @{
-                stringValue = $osVersion.ToString()
-            }
-            commandLine = @{
-                stringValue = $commandLineArgs -join " "
-            }
-            currentDirectory = @{
-                stringValue = $currentDirectory
-            }
-            systemDirectory = @{
-                stringValue = $systemDirectory
-            }
-            processorCount = @{
-                integerValue = $processorCount
-            }
-        }
-    } | ConvertTo-Json -Depth 10
-
-    # Definer HTTP-headere
-    $headers = @{
-        "Content-Type" = "application/json"
-    }
-
-    # Send POST-forespørselen for å opprette den nye kolleksjonen og lagre informasjonen
-    try {
-        $response = Invoke-RestMethod -Uri $newCollectionUrl -Method Post -Body $body -Headers $headers
-        Write-Output "Response from Firestore: $response"
-    } catch {
-        Write-Error "Error sending data to Firestore: $_"
-    }
+try {
+    Invoke-RestMethod -Uri $documentUrl -Method Patch -Body $removeDummyField -ContentType 'application/json'
+    Write-Output "Dummy field removed from the document"
+} catch {
+    Write-Error "Error removing dummy field from the document: $_"
 }
