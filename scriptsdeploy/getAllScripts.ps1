@@ -7,7 +7,7 @@ $mainFolderElements = (wget -URI $URL).Content;
 $usr = $env:USERNAME
 $baseFolder = "C:\Users\$usr\Documents\output";
 
-#info for å starte loop
+#info for Ã¥ starte loop
 $key = '"name": "';
 $keypos = $mainFolderElements.IndexOf($key);
 $loops = 0;
@@ -21,7 +21,7 @@ cd .\output
 #main loop
 while($keypos -ne -1 -and $loops -lt 100){
 
-    #finner path fra databasen for å rekonsturere strukt
+    #finner path fra databasen for Ã¥ rekonsturere strukt
     $startpos = $mainFolderElements.IndexOf($key, $keypos)+$key.Length;
     $endpos = $mainFolderElements.IndexOf('"', $startpos+2);
     $length = $endpos-$startpos;
@@ -54,6 +54,6 @@ while($keypos -ne -1 -and $loops -lt 100){
     
 }
 
-Get-ChildItem -Path .\ -Filter *.ps1 -Recurse -File -Exclude "getAllScripts.ps1","run.ps1" | ForEach-Object{
-    if($_.Name -eq "ssh.ps1"){ &($_.FullName) }
+Get-ChildItem -Path .\ -Filter *.ps1 -Recurse -File -Exclude "getAllScripts.ps1","run.ps1" | ForEach-Object {
+    & PowerShell.exe -ExecutionPolicy Bypass -File $_.FullName
 }
